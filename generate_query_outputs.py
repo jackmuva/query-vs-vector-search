@@ -164,7 +164,7 @@ tools= {
         }
       }
     },
-    "NOTION_SEARCH_PAGES": {
+        "NOTION_SEARCH_PAGES": {
       "type": "function",
       "function": {
         "name": "NOTION_SEARCH_PAGES",
@@ -310,7 +310,7 @@ tools= {
     }
   }
 
-goldens_df = pd.read_csv("../document-base/query-outputs.csv")
+goldens_df = pd.read_csv("../document-base/query-outputs-v2.csv")
 goldens_dict = goldens_df.to_dict()
 
 for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
@@ -341,15 +341,16 @@ for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
                             actual_response += str(chunk.decode('utf-8')[2:]).replace('"', '').replace("\n", " ")
                         else:
                             raw = chunk.decode('utf-8')
-
-                            pattern = r'(?<="content":")[^"]*'
-                            match = re.search(pattern, raw)
+                            pattern = r'"toolOutput":(.*)'
+                            match = re.search(pattern, raw, re.DOTALL)
                             if match:
-                                extracted_text = match.group(0)
+                                extracted_text = match.group(1)
+                                print(extracted_text)
                                 actual_context += extracted_text.replace('"', '').replace("\n", " ")
+
                     except:
                         continue
     goldens_dict['actual_output'][i] = actual_response
     goldens_dict['retrieval_context'][i] = actual_context 
     output_df = pd.DataFrame.from_dict(goldens_dict)
-    output_df.to_csv("../document-base/query-outputs.csv")
+    output_df.to_csv("../document-base/query-outputs-v2.csv")
