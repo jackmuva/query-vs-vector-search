@@ -6,9 +6,9 @@ import json
 
 load_dotenv()
 
-vs_dataset = EvaluationDataset()
+query_dataset = EvaluationDataset()
 
-vs_dataset.add_test_cases_from_csv_file(
+query_dataset.add_test_cases_from_csv_file(
     file_path="../document-base/query-outputs-v3.csv",
     input_col_name="input",
     actual_output_col_name="actual_output",
@@ -23,13 +23,16 @@ answer_relevancy = AnswerRelevancyMetric(threshold=0.5)
 faithfulness = FaithfulnessMetric(threshold=0.5)
 contextual_relevancy = ContextualRelevancyMetric(threshold=0.5)
 
-index = 0
-for test in vs_dataset.test_cases:
-    print(index)
-    try:
-        evaluation = evaluate([test], metrics=[answer_relevancy, faithfulness, contextual_relevancy], max_concurrent=1);
-        with open("../document-base/query_eval.json", "a") as f:
-            json.dump(evaluation.model_dump(), f)
-    except:
-        print("[ERROR]: " + str(index))
-        continue
+evaluation = evaluate(query_dataset,metrics=[answer_relevancy, faithfulness, contextual_relevancy], max_concurrent=1, ignore_errors=True, run_async=False, throttle_value=60, use_cache=True);
+with open("../document-base/query_eval_v2.json", "w") as f:
+     json.dump(evaluation.model_dump(), f)
+
+# for index in range(5, len(query_dataset.test_cases)):
+#     print(index)
+#     try:
+#         evaluation = evaluate([query_dataset.test_cases[index]], metrics=[answer_relevancy, faithfulness, contextual_relevancy], max_concurrent=1, ignore_errors=True, run_async=False);
+#         with open("../document-base/query_eval.json", "a") as f:
+#             json.dump(evaluation.model_dump(), f)
+#     except:
+#         print("[ERROR]: " + str(index))
+#         continue

@@ -24,13 +24,17 @@ answer_relevancy = AnswerRelevancyMetric(threshold=0.5)
 faithfulness = FaithfulnessMetric(threshold=0.5)
 contextual_relevancy = ContextualRelevancyMetric(threshold=0.5)
 
-index = 0
-for test in vs_dataset.test_cases:
-    print(index)
-    try:
-        evaluation = evaluate([test], metrics=[answer_relevancy, faithfulness, contextual_relevancy], max_concurrent=1);
-        with open("../document-base/vs_eval.json", "a") as f:
-            json.dump(evaluation.model_dump(), f)
-    except:
-        print("[ERROR]: " + str(index))
-        continue
+evaluation = evaluate(vs_dataset,metrics=[answer_relevancy, faithfulness, contextual_relevancy], max_concurrent=1, ignore_errors=True, run_async=False, throttle_value=60, use_cache=True);
+with open("../document-base/vs_eval_v2.json", "w") as f:
+     json.dump(evaluation.model_dump(), f)
+
+
+# for index in range(0, len(vs_dataset.test_cases)):
+#     print(index)
+#     try:
+#         evaluation = evaluate([vs_dataset.test_cases[index]], metrics=[answer_relevancy, faithfulness, contextual_relevancy], max_concurrent=1);
+#         with open("../document-base/vs_eval.json", "a") as f:
+#             json.dump(evaluation.model_dump(), f)
+#     except:
+#         print("[ERROR]: " + str(index))
+#         continue
