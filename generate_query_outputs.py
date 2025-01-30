@@ -310,11 +310,11 @@ tools= {
     }
   }
 
-goldens_df = pd.read_csv("../document-base/query-outputs-v2.csv")
+goldens_df = pd.read_csv("../document-base/query-outputs-v3.csv")
 goldens_dict = goldens_df.to_dict()
 
 for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
-    if str(goldens_dict['actual_output'][i]) != 'nan':
+    if str(goldens_dict['actual_output'][i]) != 'nan' or str(goldens_dict['retrieval_context'][i]) != 'nan':
         continue
 
     prefix = "From Notion, "
@@ -334,6 +334,7 @@ for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
     response = requests.post(url + "/api/chat", json=body, headers={"Authorization": "Bearer " + jwt}, stream=True)
     if response.status_code==200:
         with response:
+            continuous_chunk = False
             for chunk in response.iter_content(chunk_size=512):
                 if chunk:
                     try:
@@ -344,13 +345,21 @@ for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
                             pattern = r'"toolOutput":(.*)'
                             match = re.search(pattern, raw, re.DOTALL)
                             if match:
+                                continuous_chunk = True
                                 extracted_text = match.group(1)
-                                print(extracted_text)
                                 actual_context += extracted_text.replace('"', '').replace("\n", " ")
-
+                            elif continuous_chunk:
+                                raw = (chunk.decode('utf-8'))
+                                pattern = r'^(.*?)(?=8:)'
+                                match = re.search(pattern, raw)
+                                if match:
+                                    captured_output = match.group(1)
+                                    actual_context += captured_output.strip().replace('"', '').replace("\n", " ")
                     except:
                         continue
+            continuous_chunk = False
+    print(actual_context)
     goldens_dict['actual_output'][i] = actual_response
     goldens_dict['retrieval_context'][i] = actual_context 
     output_df = pd.DataFrame.from_dict(goldens_dict)
-    output_df.to_csv("../document-base/query-outputs-v2.csv")
+    output_df.to_csv("../document-base/query-outputs-v3.csv")
