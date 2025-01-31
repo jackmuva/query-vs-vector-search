@@ -11,7 +11,7 @@ data = {
 response = requests.post(url + "/api/auth/signJwt", json=data)
 jwt = response.json()['jwt']
 
-goldens_df = pd.read_csv("../document-base/golden.csv")
+goldens_df = pd.read_csv("../results/golden.csv")
 goldens_dict = goldens_df.to_dict()
 for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
     prompt = goldens_dict['input'][i]
@@ -42,4 +42,4 @@ for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
     goldens_dict['actual_output'][i] = actual_response
     goldens_dict['retrieval_context'][i] = actual_context 
 output_df = pd.DataFrame.from_dict(goldens_dict)
-output_df.to_csv("../document-base/parato-outputs.csv")
+output_df.to_csv("../results/parato-outputs.csv")

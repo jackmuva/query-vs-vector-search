@@ -30,6 +30,6 @@ def generateGoldens():
     )
     
     golden_dataframe = synthesizer.to_pandas()
-    golden_dataframe.to_csv('../document-base/golden.csv')
+    golden_dataframe.to_csv('../results/golden.csv')
 
 generateGoldens()

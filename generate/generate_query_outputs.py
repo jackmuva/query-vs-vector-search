@@ -310,7 +310,7 @@ tools= {
     }
   }
 
-goldens_df = pd.read_csv("../document-base/query-outputs-v3.csv")
+goldens_df = pd.read_csv("../results/query-outputs-v3.csv")
 goldens_dict = goldens_df.to_dict()
 
 for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
@@ -362,4 +362,4 @@ for i in goldens_dict[list(goldens_dict.keys())[0]].keys():
     goldens_dict['actual_output'][i] = actual_response
     goldens_dict['retrieval_context'][i] = actual_context 
     output_df = pd.DataFrame.from_dict(goldens_dict)
-    output_df.to_csv("../document-base/query-outputs-v3.csv")
+    output_df.to_csv("../results/query-outputs-v3.csv")
